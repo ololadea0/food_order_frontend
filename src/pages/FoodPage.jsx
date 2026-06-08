@@ -119,8 +119,7 @@ function FoodPage() {
               </h3>
               <ul className="space-y-2 text-gray-600">
                 <li>Preparation time: {food.preparationTime || 15} minutes</li>
-                <li>Delivery fee applies to delivery orders only</li>
-                <li>Freshly prepared with quality ingredients</li>
+                {food.additionalInfo && <li>{food.additionalInfo}</li>}
               </ul>
             </div>
           </div>

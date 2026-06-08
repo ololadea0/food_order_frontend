@@ -21,6 +21,7 @@ const emptyForm = {
   preparationTime: "",
   image: "",
   available: true,
+  additionalInfo: "",
 };
 
 function AdminFood() {
@@ -71,6 +72,7 @@ function AdminFood() {
       preparationTime: food.preparationTime || "",
       image: food.image || "",
       available: food.available !== false,
+      additionalInfo: food.additionalInfo || "",
     });
     setIsFormOpen(true);
   };
@@ -127,6 +129,7 @@ function AdminFood() {
       preparationTime: Number(formData.preparationTime),
       image: formData.image,
       available: formData.available,
+      additionalInfo: formData.additionalInfo.trim(),
     };
 
     if (
@@ -293,6 +296,20 @@ function AdminFood() {
                 onChange={handleChange}
                 required
                 rows="4"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm text-gray-600 mb-2">
+                Additional Information
+              </label>
+              <textarea
+                name="additionalInfo"
+                value={formData.additionalInfo}
+                onChange={handleChange}
+                rows="3"
+                placeholder="e.g., Delivery fee applies to delivery orders only"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent"
               />
             </div>

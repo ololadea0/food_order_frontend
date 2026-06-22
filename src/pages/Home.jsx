@@ -5,7 +5,6 @@ import Footer from "../components/Footer";
 import FoodItem from "../components/FoodItem";
 import Spinner from "../components/Spinner";
 import { fetchFoods } from "../slice/foodSlice";
-import { getEstimatedPrepTime } from "../utils/orderTiming";
 
 function Home() {
   const dispatch = useDispatch();
@@ -21,12 +20,6 @@ function Home() {
         ),
       )
     : availableFoods;
-  const prepTimes = availableFoods
-    .map((food) => food.preparationTime)
-    .filter((time) => Number.isFinite(time) && time > 0);
-  const fastestPrepTime = prepTimes.length > 0 ? Math.min(...prepTimes) : 15;
-  const slowestPrepTime =
-    prepTimes.length > 0 ? Math.max(...prepTimes) : getEstimatedPrepTime();
 
   useEffect(() => {
     if (isError) {
@@ -49,10 +42,6 @@ function Home() {
           </h2>
           <p className="text-lg text-gray-600">
             Fast Delivery | Quality Ingredients | Best Prices
-          </p>
-          <p className="text-sm text-[#FF6B35] mt-3">
-            Menu prep time typically ranges from {fastestPrepTime} to{" "}
-            {slowestPrepTime} minutes.
           </p>
         </div>
         {normalizedSearchTerm && (

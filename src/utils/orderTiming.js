@@ -6,7 +6,8 @@ const getPrepTimes = (items = []) =>
 export const getEstimatedPrepTime = (items = []) => {
   const prepTimes = getPrepTimes(items);
 
-  if (prepTimes.length === 0) {
+  if (prepTimes.length === 0)
+  {
     return 15;
   }
 
@@ -17,6 +18,16 @@ export const getEstimatedPrepTime = (items = []) => {
 
 export const getEstimatedOrderWindow = (items = [], orderType = "delivery") => {
   const prepTime = getEstimatedPrepTime(items);
-  const extraMinutes = orderType === "delivery" ? 15 : 5;
+  const packingTime = 10;
+  const extraMinutes = orderType === "delivery" ? 15 : packingTime;
+  const isFastFood = items.some(
+    (item) => item?.category === "Fast Food" || item?.food?.category === "Fast Food"
+  );
+
+  if (orderType === "pickup" && isFastFood)
+  {
+    return `${prepTime + packingTime}-${prepTime + packingTime + 5} minutes (includes ${packingTime} mins packing)`;
+  }
+
   return `${prepTime}-${prepTime + extraMinutes} minutes`;
 };

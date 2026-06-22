@@ -1,14 +1,25 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, MapPin, Settings, Package2, LogOut, Key } from "lucide-react";
+import {
+  User,
+  MapPin,
+  Settings,
+  Package2,
+  LogOut,
+  Key,
+  Bell,
+} from "lucide-react";
 import { logoutUser, reset } from "../slice/authSlice";
+import { getMyOrders } from "../slice/orderSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 function Profile() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [notifications, setNotifications] = useState([]);
 
   const { user } = useSelector((state) => state.auth);
+  const { orders = [] } = useSelector((state) => state.order || { orders: [] });
 
   const address = user?.deliveryAddress?.address || "";
   const city = user?.deliveryAddress?.city || "";
@@ -17,8 +28,48 @@ function Profile() {
   useEffect(() => {
     if (!user) {
       navigate("/login", { replace: true });
+    } else {
+      dispatch(getMyOrders());
     }
-  }, [user, navigate]);
+  }, [user, navigate, dispatch]);
+
+  useEffect(() => {
+    if (orders && Array.isArray(orders)) {
+      const activeOrders = orders.filter(
+        (order) => order.status !== "Delivered" && order.status !== "Cancelled",
+      );
+      const newNotifications = activeOrders
+        .map((order) => {
+          if (order.status === "Preparing") {
+            return {
+              id: order._id,
+              message: `Your order #${order._id.slice(-4)} will be ready in approximately ${order.estimatedTime || 20} minutes`,
+              type: "preparing",
+              timestamp: new Date(order.createdAt),
+            };
+          }
+          if (order.status === "Out for Delivery") {
+            return {
+              id: order._id,
+              message: `Your order #${order._id.slice(-4)} is out for delivery. You will receive it soon.`,
+              type: "delivery",
+              timestamp: new Date(order.updatedAt),
+            };
+          }
+          if (order.delayStatus) {
+            return {
+              id: order._id,
+              message: `Your order #${order._id.slice(-4)} is experiencing a slight delay. We appreciate your patience.`,
+              type: "delay",
+              timestamp: new Date(order.updatedAt),
+            };
+          }
+          return null;
+        })
+        .filter(Boolean);
+      setNotifications(newNotifications);
+    }
+  }, [orders]);
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -52,6 +103,35 @@ function Profile() {
             </div>
           </div>
           <div className="md:col-span-2 space-y-4">
+            {notifications.length > 0 && (
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Bell className="h-5 w-5 text-[#FF6B35]" />
+                  <h3 className="text-xl text-[#2C2C2C]">
+                    Order Notifications
+                  </h3>
+                </div>
+                <div className="space-y-3">
+                  {notifications.map((notif) => (
+                    <div
+                      key={notif.id}
+                      className={`p-4 border-l-4 rounded-lg ${
+                        notif.type === "delay"
+                          ? "border-l-red-500 bg-red-50"
+                          : notif.type === "delivery"
+                            ? "border-l-blue-500 bg-blue-50"
+                            : "border-l-green-500 bg-green-50"
+                      }`}
+                    >
+                      <p className="text-sm text-gray-700">{notif.message}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {notif.timestamp.toLocaleTimeString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center gap-2 mb-4">
                 <MapPin className=" h-5 w-5 text-[#FF6B35]" />

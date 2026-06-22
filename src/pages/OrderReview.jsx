@@ -116,7 +116,7 @@ function OrderReview() {
                       Quantity: {item.qty}
                     </p>
                     <p className="text-xs text-gray-500">
-                      Prep time: {item.preparationTime || 15} minutes
+                      Prep time: {item.preparationTime} minutes
                     </p>
                   </div>
                   <p className="text-[#2c2c2c]">
@@ -212,14 +212,14 @@ function OrderReview() {
                 </div>
               ))}
             </div>
-              <div className="border-t border-gray-200 pt-3 space-y-2 mb-6">
-                <div className="flex justify-between text-gray-600">
-                  <span>Estimated Time</span>
-                  <span>{estimatedWindow}</span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Subtotal</span>
-                  <span>{formatCurrency(subtotal)}</span>
+            <div className="border-t border-gray-200 pt-3 space-y-2 mb-6">
+              <div className="flex justify-between text-gray-600">
+                <span>Estimated Time</span>
+                <span>{estimatedWindow}</span>
+              </div>
+              <div className="flex justify-between text-gray-600">
+                <span>Subtotal</span>
+                <span>{formatCurrency(subtotal)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>

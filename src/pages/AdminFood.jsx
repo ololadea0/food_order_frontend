@@ -15,7 +15,7 @@ import {
 
 const emptyForm = {
   name: "",
-  category: "",
+  category: "Fast Food",
   description: "",
   price: "",
   preparationTime: "",
@@ -23,6 +23,8 @@ const emptyForm = {
   available: true,
   additionalInfo: "",
 };
+
+const categoryOptions = ["Fast Food", "Ready to Serve", "Drink", "Snack"];
 
 function AdminFood() {
   const dispatch = useDispatch();
@@ -66,7 +68,7 @@ function AdminFood() {
     setEditingFoodId(food._id);
     setFormData({
       name: food.name || "",
-      category: food.category || "",
+      category: food.category || "Fast Food",
       description: food.description || "",
       price: food.price || "",
       preparationTime: food.preparationTime || "",
@@ -85,9 +87,14 @@ function AdminFood() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    const normalizedValue =
+      name === "name" && value
+        ? value.charAt(0).toUpperCase() + value.slice(1)
+        : value;
+
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : normalizedValue,
     }));
   };
 
@@ -123,10 +130,13 @@ function AdminFood() {
 
     const payload = {
       name: formData.name.trim(),
-      category: formData.category.trim(),
+      category: formData.category,
       description: formData.description.trim(),
       price: Number(formData.price),
-      preparationTime: Number(formData.preparationTime),
+      preparationTime:
+        formData.category === "Fast Food"
+          ? Number(formData.preparationTime)
+          : 0,
       image: formData.image,
       available: formData.available,
       additionalInfo: formData.additionalInfo.trim(),
@@ -139,8 +149,13 @@ function AdminFood() {
       !payload.image
     ) {
       toast.error(
-        "Name, category, description, preparation time, and uploaded image are required",
+        "Name, category, description, and uploaded image are required",
       );
+      return;
+    }
+
+    if (payload.category === "Fast Food" && !formData.preparationTime) {
+      toast.error("Preparation time is required for Fast Food items");
       return;
     }
 
@@ -149,9 +164,14 @@ function AdminFood() {
       return;
     }
 
-    if (Number.isNaN(payload.preparationTime) || payload.preparationTime <= 0) {
-      toast.error("Preparation time must be a valid number");
-      return;
+    if (payload.category === "Fast Food") {
+      if (
+        Number.isNaN(payload.preparationTime) ||
+        payload.preparationTime <= 0
+      ) {
+        toast.error("Preparation time must be a valid number");
+        return;
+      }
     }
 
     try {
@@ -228,29 +248,41 @@ function AdminFood() {
               <label className="block text-sm text-gray-600 mb-2">
                 Category
               </label>
-              <input
-                type="text"
+              <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent"
-              />
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent"
+              >
+                {categoryOptions.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <div>
-              <label className="block text-sm text-gray-600 mb-2">
-                Preparation Time
-              </label>
-              <input
-                type="number"
-                name="preparationTime"
-                value={formData.preparationTime}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent"
-              />
-            </div>
+            {formData.category === "Fast Food" ? (
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">
+                  Preparation Time
+                </label>
+                <input
+                  type="number"
+                  name="preparationTime"
+                  value={formData.preparationTime}
+                  onChange={handleChange}
+                  step="5"
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent"
+                />
+              </div>
+            ) : (
+              <div className="md:col-span-2 text-sm text-gray-500">
+                Preparation time is only required for Fast Food items.
+              </div>
+            )}
 
             <div>
               <label className="block text-sm text-gray-600 mb-2">Price</label>
@@ -258,7 +290,7 @@ function AdminFood() {
                 type="number"
                 name="price"
                 min="0"
-                step="0.01"
+                step="100"
                 value={formData.price}
                 onChange={handleChange}
                 required

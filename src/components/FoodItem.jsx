@@ -39,8 +39,16 @@ const FoodItem = ({ food }) => {
           {food.description}
         </p>
         <div className="flex items-center gap-2 text-xs text-gray-500 mb-3">
-          <Clock3 className="h-4 w-4" />
-          <span>{food.preparationTime || 15} mins prep</span>
+          {food.category === "Fast Food" ? (
+            <>
+              <Clock3 className="h-4 w-4" />
+              <span>{food.preparationTime || 15} mins prep</span>
+            </>
+          ) : (
+            <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-gray-600">
+              {food.category}
+            </span>
+          )}
         </div>
         <div className="flex items-center justify-between mt-4">
           <span className="text-xl text-[#FF6B35]">

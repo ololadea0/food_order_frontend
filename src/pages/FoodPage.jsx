@@ -6,6 +6,7 @@ import { fetchFoodById } from "../slice/foodSlice";
 import { addToCart } from "../slice/cartSlice";
 import Spinner from "../components/Spinner";
 import { formatCurrency } from "../utils/formatCurrency";
+import ReactMarkdown from "react-markdown";
 
 function FoodPage() {
   const navigate = useNavigate();
@@ -117,10 +118,18 @@ function FoodPage() {
               <h3 className="text-lg text-[#2C2C2C] mb-4">
                 Additional Information
               </h3>
-              <ul className="space-y-2 text-gray-600">
-                <li>Preparation time: {food.preparationTime || 15} minutes</li>
-                {food.additionalInfo && <li>{food.additionalInfo}</li>}
-              </ul>
+
+              {food.preparationTime && (
+                <ul className="space-y-2 text-gray-600">
+                  <li>Preparation time: {food.preparationTime} minutes</li>
+                </ul>
+              )}
+
+              {food.additionalInfo && (
+                <div className="prose prose-sm text-gray-600 max-w-none whitespace-pre-wrap mt-4">
+                  <ReactMarkdown>{food.additionalInfo}</ReactMarkdown>
+                </div>
+              )}
             </div>
           </div>
         </div>

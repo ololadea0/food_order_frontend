@@ -130,12 +130,17 @@ function OrderTracking() {
               <div>
                 <p className="text-[#2C2C2C]">{item.food?.name}</p>
                 <p className="text-sm text-gray-600">Quantity: {item.qty}</p>
-                <p className="text-xs text-gray-500">
-                  Prep time: {item.food?.preparationTime || item.preparationTime || 15} minutes
-                </p>
+                {item.preparationTime && (
+                  <p className="text-xs text-gray-500">
+                    Prep time: {item.preparationTime} minutes
+                  </p>
+                )}
               </div>
+
               <p className="text-[#2C2C2C]">
-                {formatCurrency((item.price ?? item.food?.price ?? 0) * item.qty)}
+                {formatCurrency(
+                  (item.price ?? item.food?.price ?? 0) * item.qty,
+                )}
               </p>
             </div>
           ))}
